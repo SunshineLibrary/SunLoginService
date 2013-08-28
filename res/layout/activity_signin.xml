@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#f2f2f2"
+        android:layout_gravity="center"
+        android:gravity="center">
+
+    <RelativeLayout
+            android:id="@+id/account_type_selector"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="200dp"
+            android:visibility="gone">
+        <ImageButton
+                android:id="@+id/signin_account_teacher"
+                android:src="@drawable/btn_signin_teacher"
+                android:scaleType="centerCrop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:clickable="true"/>
+        <ImageButton
+                android:id="@+id/signin_account_student"
+                android:src="@drawable/btn_signin_student"
+                android:scaleType="centerCrop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_toRightOf="@+id/signin_account_teacher"
+                android:clickable="true"/>
+    </RelativeLayout>
+
+    <include layout="@layout/form_siginin"
+             android:id="@+id/signin_form"
+             android:visibility="gone"
+             android:layout_width="460dp"
+             android:layout_height="wrap_content"
+             android:layout_centerHorizontal="true"
+             android:layout_marginTop="180dp"/>
+
+
+    <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/img_logo_sunshine"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="44dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"/>
+
+
+</RelativeLayout>
