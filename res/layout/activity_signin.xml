@@ -22,7 +22,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:clickable="true"/>
+                android:clickable="true"
+                android:background="#00000000"/>
         <ImageButton
                 android:id="@+id/signin_account_student"
                 android:src="@drawable/btn_signin_student"
@@ -31,7 +32,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:layout_toRightOf="@+id/signin_account_teacher"
-                android:clickable="true"/>
+                android:clickable="true"
+                android:background="#00000000"/>
     </RelativeLayout>
 
     <include layout="@layout/form_siginin"

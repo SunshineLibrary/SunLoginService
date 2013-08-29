@@ -21,7 +21,12 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".SunLoginService" android:exported="false"/>
+        <service android:name=".SunLoginService">
+            <intent-filter>
+                <action android:name="org.sunshinelibrary.login.service"/>
+            </intent-filter>
+
+        </service>
 
         <activity android:name=".SignInActivity"
                   android:screenOrientation="sensorLandscape"
