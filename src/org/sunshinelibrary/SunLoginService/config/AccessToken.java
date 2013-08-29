@@ -141,7 +141,7 @@ public class AccessToken {
         editor.putString("USER_INFO",jsonNow.toString());
         editor.commit();
 
-        mWhiteList = new WhiteList(allowNow);
+        mWhiteList = new WhiteList(null, allowNow,  context);
         Intent intent  = new Intent("org.sunshinelibrary.launcher.WHITE_LIST_CHANGED");
         intent.putStringArrayListExtra("add",mWhiteList.getOrderedPackages(allowNow));
         context.sendBroadcast(intent);
@@ -197,7 +197,7 @@ public class AccessToken {
         editor.putString("USER_INFO",jsonNow.toString());
         editor.commit();
 
-        mWhiteList = new WhiteList(allowNow);
+        mWhiteList = new WhiteList(null, allowNow, context);
         Intent intent  = new Intent("org.sunshinelibrary.launcher.WHITE_LIST_CHANGED");
         intent.putStringArrayListExtra("add",mWhiteList.getOrderedPackages(allowNow));
         context.sendBroadcast(intent);
