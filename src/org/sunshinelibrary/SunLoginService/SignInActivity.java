@@ -51,6 +51,12 @@ public class SignInActivity extends FragmentActivity implements CanclableObserve
         initComponents();
     }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+        signInForm.setVisibility(View.GONE);
+    }
+
     private void initialUI(){
         accountTypeSeletor = (RelativeLayout)findViewById(R.id.account_type_selector);
         btnAccountTeacher = (ImageButton)findViewById(R.id.signin_account_teacher);
@@ -133,8 +139,9 @@ public class SignInActivity extends FragmentActivity implements CanclableObserve
         checkLoginDialog.cancel();
         if(a){
             Toast.makeText(this,"Already log in",Toast.LENGTH_SHORT).show();
+            this.finish();
         }
-        this.finish();
+
     }
 
     @Override
@@ -165,9 +172,13 @@ public class SignInActivity extends FragmentActivity implements CanclableObserve
             signInForm.setVisibility(View.VISIBLE);
             studentsOnlyInput.setVisibility(View.GONE);
         } else if (v == btnSignIn) {
-            String[]info =new String[]{userType,userGrade,userClass,etName.getText().toString()};
-            mService.doSignIn(info);
-            checkLoginDialog.show();
+            if(!etName.getText().toString().equals("")){
+                String[]info =new String[]{userType,userGrade,userClass,etName.getText().toString()};
+                mService.doSignIn(info);
+                checkLoginDialog.show();
+            }else{
+                Toast.makeText(SignInActivity.this,"请输入名字",Toast.LENGTH_LONG).show();
+            }
         }
     }
 
