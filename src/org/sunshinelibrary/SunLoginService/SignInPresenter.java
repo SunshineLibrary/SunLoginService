@@ -94,7 +94,7 @@ public class SignInPresenter {
         mSchoolId = (schoolIds != null) ? schoolIds.get(schoolName) : StringUtils.EMPTY_STRING;
         mSchoolId = (mSchoolId != null) ? mSchoolId : StringUtils.EMPTY_STRING;
     }
-    
+
     public String getSchool() {
     	return mSchoolId;
     }
@@ -102,7 +102,7 @@ public class SignInPresenter {
     public void setAccountType(String accountType) {
         mAccountType = accountType;
     }
-    
+
     public String getAccountType() {
     	return mAccountType;
     }
@@ -110,7 +110,7 @@ public class SignInPresenter {
     public void setGrade(String grade) {
         mGrade = grade;
     }
-    
+
     public String getGrade() {
     	return mGrade;
     }
@@ -118,7 +118,7 @@ public class SignInPresenter {
     public void setName(String name) {
         mName = name;
     }
-    
+
     public String getName() {
         return mName;
     }
@@ -126,7 +126,7 @@ public class SignInPresenter {
     public void setBirthday(String birthday) {
         mBirthday = birthday;
     }
-    
+
     public String getBirthday() {
     	return mBirthday;
     }

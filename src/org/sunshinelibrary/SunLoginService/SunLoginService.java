@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.Binder;
 import android.util.Log;
+import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.sunshinelibrary.SunLoginService.utils.ConnectionUtils;
@@ -51,9 +52,9 @@ public class SunLoginService extends Service {
     }
 
     public class CheckLoginTask extends AsyncTask<Object, Object, JSONObject>{
+
         @Override
         protected void onPreExecute (){
-
             mPresenter = new SignInPresenter(mSignInActivity);
 
             String accessToken = AccessToken.getAccessToken(SunLoginService.this);
@@ -62,12 +63,10 @@ public class SunLoginService extends Service {
             if(accessToken.equals("")) {
                 Log.i(TAG, "Couldn't find any UserInfo for checking login");
                 popupLoginWindow();
-
                 this.cancel(true);
             }
 
             mPresenter.setAccessToken(accessToken);
-
         }
 
         @Override
@@ -78,27 +77,30 @@ public class SunLoginService extends Service {
             @Override
             protected void onPostExecute(JSONObject jo) {
 
-                try {
-                    if(jo.getString("status").equals("200")){
-                        try {
-                            /*String name = "Solomon(游戏账户)";
-                            String[] allow = new String[]{"org.sunshinelibrary.pack","com.tencent.mobileqq","com.speedsoftware.rootexplorer"};
-                            String avatar = "2.jpg";*/
-                            AccessToken.storeSomething(SunLoginService.this, jo);
-                            System.out.println("succeed to create sharedpreference");
-                        } catch (JSONException e) {
-                            System.out.println("failed to create sp");
-                            e.printStackTrace();
+                if(jo!=null){
+
+                    try {
+                        if(jo.getString("status").equals("200")){
+                            try {
+                                AccessToken.storeSomething(SunLoginService.this, jo);
+                                System.out.println("succeed to create sharedpreference");
+                            } catch (JSONException e) {
+                                System.out.println("failed to create sp");
+                                e.printStackTrace();
+                            }
+                            notifyAlreadyLogin(true);
+                            return;
+                        }else if(jo.getString("status").equals("401")){
+                            popupLoginWindow();
+                            return;
                         }
-                        notifyAlreadyLogin(true);
-                        return;
-                    }else if(jo.getString("status").equals("401")){
-                        popupLoginWindow();
-                        return;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
+                Toast.makeText(SunLoginService.this,mPresenter.getErrorMessage(),Toast.LENGTH_SHORT).show();
+                notifyAlreadyLogin(true);
+
             }
     }
 
@@ -124,27 +126,29 @@ public class SunLoginService extends Service {
         @Override
         protected void onPostExecute(JSONObject jo){
 
-            try {
-                if(!StringUtils.isEmpty(jo.getString("access_token"))) {
+            if(jo!=null){
 
-                    try {
-                        /*String name = "郭小楠（学习账户）";
-                        String[] allow = new String[]{"org.sunshinelibrary.pack","org.sunshinelibrary.exercise"};
-                        String avatar = "1.png";*/
-                        AccessToken.storeAccessToken(SunLoginService.this,jo/*,name,avatar,allow*/);
-                        System.out.println("succeed to create sharedpreference");
-                    } catch (JSONException e) {
-                        System.out.println("failed to create sp");
-                        e.printStackTrace();
+                try {
+                    if(!StringUtils.isEmpty(jo.getString("access_token"))) {
+                        try {
+                            AccessToken.storeAccessToken(SunLoginService.this,jo);
+                            Log.i(TAG,"succeed to create sharedpreference");
+                        } catch (JSONException e) {
+                            Log.i(TAG,"failed to create sp");
+                        }
+                        notifyAlreadyLogin(true);
+                    }else{
+                        Log.i(TAG,mPresenter.getErrorMessage());
                     }
-                    notifyAlreadyLogin(true);
-                }else{
-                    System.out.println(mPresenter.getErrorMessage());
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
+
+            Toast.makeText(SunLoginService.this,mPresenter.getErrorMessage(),Toast.LENGTH_SHORT).show();
+            notifyAlreadyLogin(false);
         }
+
     }
 
     public class LoadSchoolTask extends AsyncTask<Object,Object,String>{
@@ -155,10 +159,6 @@ public class SunLoginService extends Service {
             mSchoolStrings = mPresenter.loadSchools(mEmptySchoolStrings);
 
             return mSchoolStrings[0];
-        }
-
-        @Override
-        protected void onPostExecute(String schoolName){
         }
     }
 
@@ -173,6 +173,7 @@ public class SunLoginService extends Service {
        }catch (Exception e){
            Log.e(TAG,"activity not found");
        }
+       this.stopSelf();
     }
 
     public void popupLoginWindow(){
@@ -189,7 +190,7 @@ public class SunLoginService extends Service {
             new CheckLoginTask().execute();
 
         }else{
-            notifyAlreadyLogin(false);
+            notifyAlreadyLogin(true);
         }
     }
 

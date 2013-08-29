@@ -82,18 +82,9 @@ public class AccessToken {
         return mUserClass;
     }
 
-    public static final void storeAccessToken(Context context, JSONObject jo/*, String name, String avatar, String[] allow*/) throws JSONException {
+    public static final void storeAccessToken(Context context, JSONObject jo) throws JSONException {
 
         mAccessToken = jo.getString("access_token");
-       /* mAccountType = presenter.getAccountType();
-        mUserName = presenter.getName();
-        mUserBirthday = presenter.getBirthday();
-        mUserSchool = presenter.getSchool();
-        mUserGrade = presenter.getGrade();
-
-        String something = "{\"user_avatar\":"+avatar+","+"\"user_name\":"+"\""+name+"\""+","+"\"user_account_type\":"+"\""+mAccountType+"\""+","
-                +"\"user_grade\":"+"\""+mUserGrade+"\""+","+"\"user_birthday\":"+"\""+mUserBirthday+"\""+","
-                +"\"user_allowed_apps\":"+"["+allow[0]+","+allow[1]+"]"+"}";*/
 
         JSONObject jsonNow = jo;
         JSONArray allowNow = jsonNow.getJSONObject("user_info").getJSONArray("user_allowed_apps");
@@ -110,7 +101,7 @@ public class AccessToken {
 
             if(!jsonOrigin.equals("")){
 
-                JSONArray allowOrigin = jsonOrigin.getJSONArray("user_allowed_apps");
+                JSONArray allowOrigin = jsonOrigin.getJSONObject("user_info").getJSONArray("user_allowed_apps");
 
                 mWhiteList = new WhiteList(allowOrigin,allowNow,context);
 

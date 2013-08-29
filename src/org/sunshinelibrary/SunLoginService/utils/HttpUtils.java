@@ -56,6 +56,8 @@ public class HttpUtils {
 
                     int statusCode = response.getStatusLine().getStatusCode();
 
+                    Log.i(TAG,String.valueOf(statusCode));
+
                     if (statusCode < 200 || statusCode > 300)
                         return null;
 
@@ -64,6 +66,9 @@ public class HttpUtils {
                     IOUtils.copyCharacterStream(reader, writer);
 
                     result = writer.toString();
+
+
+
                 } catch (IOException e) {
                     Log.e(TAG, String.format("Failed Request: %s [%s]", request.getURI(), request.getMethod()), e);
                 }
