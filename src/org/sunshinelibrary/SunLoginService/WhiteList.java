@@ -1,5 +1,7 @@
 package org.sunshinelibrary.SunLoginService;
 
+
+
 import android.content.Intent;
 import android.content.Context;
 import android.util.Log;
@@ -20,59 +22,46 @@ import java.util.Comparator;
 
 public class WhiteList {
 
-    private JSONArray mJsonArrayOrigin;
-    private JSONArray mJsonArrayNow;
-    private JSONArray mArray;
+    private ArrayList<String> mArrayListOrigin;
+    private ArrayList<String> mArrayListNow;
     private Context mContext;
     private static final String TAG = "WhiteListRelated";
+    private static final String WHITE_LIST = "org.sunshinelibrary.launcher.WHITE_LIST_CHANGED";
 
     public WhiteList(JSONArray arrayOrigin, JSONArray arrayNow, Context context){
-
-        mJsonArrayOrigin = arrayOrigin;
-        mJsonArrayNow = arrayNow;
+        mArrayListOrigin = getOrderedPackages(arrayOrigin);
+        mArrayListNow = getOrderedPackages(arrayNow);
         mContext = context;
-
-    }
-
-    public WhiteList(JSONArray array){
-
-        mArray = array;
-
-    }
-
-    private boolean isLengthEqual(){
-
-        return mJsonArrayOrigin.length()==mJsonArrayNow.length();
-
     }
 
     public boolean isChanged(){
+        boolean changed = (mArrayListNow.size() != mArrayListOrigin.size());
 
-        if(!isLengthEqual()){
-            return true;
-        }
-
-        // If these two ArrayLists is lengthEqual, check their fist item.
-        ArrayList<String> mArrayListOrigin = getOrderedPackages(mJsonArrayOrigin);
-        ArrayList<String> mArrayListNow = getOrderedPackages(mJsonArrayNow);
-
-        return !mArrayListOrigin.get(0).equals(mArrayListNow.get(0));
+        if(!changed)
+            changed = mArrayListNow.containsAll(mArrayListOrigin);
+        return changed;
     }
 
     public ArrayList<String> getOrderedPackages(JSONArray array){
 
         ArrayList<String> list = new ArrayList<String>();
+        if (array == null) {
+            return list;
+        }
 
-        for(int i=0;i<array.length();i++){
+        for(int i=0;i<array.length();++i){
             try {
-                list.add(array.getString(i));
+                String s = array.getString(i);
+                if (!list.contains(s)){
+                    list.add(s);
+                }
             } catch (JSONException e) {
                 Log.e(TAG,"failed to get package name from JsonArray");
             }
         }
 
         Collections.sort(list,APP_NAME_COMPARATOR);
-        System.out.println("ordered list"+list);
+        Log.i(TAG, "ordered list"+list);
 
         return list;
     }
@@ -87,9 +76,18 @@ public class WhiteList {
     };
 
     public void informChanged(){
-        Intent intent  = new Intent("org.sunshinelibrary.launcher.WHITE_LIST_CHANGED");
-        intent.putStringArrayListExtra("remove",getOrderedPackages(mJsonArrayOrigin));
-        intent.putStringArrayListExtra("add",getOrderedPackages(mJsonArrayNow));
+        Intent intent  = new Intent(WHITE_LIST);
+
+        ArrayList<String> remove = new ArrayList<String>();
+        remove.addAll(mArrayListOrigin);
+        remove.removeAll(mArrayListNow);
+
+        ArrayList<String> add = new ArrayList<String>();
+        add.addAll(mArrayListNow);
+        add.removeAll(mArrayListOrigin);
+
+        intent.putStringArrayListExtra("remove",remove);
+        intent.putStringArrayListExtra("add",add);
         mContext.sendBroadcast(intent);
     }
 

@@ -78,7 +78,6 @@ public class SunLoginService extends Service {
             protected void onPostExecute(JSONObject jo) {
 
                 if(jo!=null){
-
                     try {
                         if(jo.getString("status").equals("200")){
                             try {
@@ -100,7 +99,6 @@ public class SunLoginService extends Service {
                 }
                 Toast.makeText(SunLoginService.this,mPresenter.getErrorMessage(),Toast.LENGTH_SHORT).show();
                 notifyAlreadyLogin(true);
-
             }
     }
 
@@ -127,7 +125,6 @@ public class SunLoginService extends Service {
         protected void onPostExecute(JSONObject jo){
 
             if(jo!=null){
-
                 try {
                     if(!StringUtils.isEmpty(jo.getString("access_token"))) {
                         try {
@@ -144,7 +141,6 @@ public class SunLoginService extends Service {
                     e.printStackTrace();
                 }
             }
-
             Toast.makeText(SunLoginService.this,mPresenter.getErrorMessage(),Toast.LENGTH_SHORT).show();
             notifyAlreadyLogin(false);
         }
