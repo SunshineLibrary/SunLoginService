@@ -85,7 +85,6 @@ public class WhiteList {
         ArrayList<String> add = new ArrayList<String>();
         add.addAll(mArrayListNow);
         add.removeAll(mArrayListOrigin);
-
         intent.putStringArrayListExtra("remove",remove);
         intent.putStringArrayListExtra("add",add);
         mContext.sendBroadcast(intent);
