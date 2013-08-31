@@ -11,7 +11,12 @@
 # generated files
 bin/
 gen/
+
+# keystore file
 key/
+
+# keypass
+ant.properties
 
 # Local configuration file (sdk path, etc)
 local.properties
