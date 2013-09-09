@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.sunshinelibrary.SunLoginService"
-          android:versionCode="1"
-          android:versionName="0.0.1">
+          package="org.sunshinelibrary.login"
+          android:versionCode="0"
+          android:versionName="0.9.0">
 
     <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="15"/>
 
@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <!--<permission android:name="org.sunshinelibrary.SunLoginService.WHITE_LIST_CHANGED"/>  -->
+    <!--<permission android:name="org.sunshinelibrary.login.WHITE_LIST_CHANGED"/>  -->
 
     <application android:icon="@drawable/icon" android:label="@string/app_name">
 
@@ -23,9 +23,8 @@
 
         <service android:name=".SunLoginService">
             <intent-filter>
-                <action android:name="org.sunshinelibrary.login.service"/>
+                <action android:name="org.sunshinelibrary.loginlimit"/>
             </intent-filter>
-
         </service>
 
         <activity android:name=".SignInActivity"

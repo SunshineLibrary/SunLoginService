@@ -1,9 +1,9 @@
-package org.sunshinelibrary.SunLoginService.config;
+package org.sunshinelibrary.login.config;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import org.sunshinelibrary.SunLoginService.R;
+import org.sunshinelibrary.login.R;
 
 /**
  * @author Bowen Sun

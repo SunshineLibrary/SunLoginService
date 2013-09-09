@@ -1,4 +1,4 @@
-package org.sunshinelibrary.SunLoginService;
+package org.sunshinelibrary.login;
 
 /**
  * Created with IntelliJ IDEA.
@@ -7,7 +7,6 @@ package org.sunshinelibrary.SunLoginService;
  * Time: 下午3:34
  */
 import android.app.ProgressDialog;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
@@ -17,10 +16,8 @@ import android.content.Context;
 import android.content.ServiceConnection;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
-import org.sunshinelibrary.SunLoginService.SunLoginService.LocalBinder;
+import org.sunshinelibrary.login.SunLoginService.LocalBinder;
 import android.content.ComponentName;
 
 
@@ -30,12 +27,13 @@ public class SignInActivity extends FragmentActivity implements CanclableObserve
     private boolean mBound = false;
     private ProgressDialog checkLoginDialog;
 
+
     private RelativeLayout accountTypeSeletor,studentsOnlyInput;
     private ImageButton btnAccountTeacher,btnAccountStudent;
     private LinearLayout signInForm;
     private Spinner spGrade,spClass;
     private EditText etName;
-    private Button btnSignIn;
+    private ImageButton btnSignIn;
 
     private String userType = null;
     private String userClass = null;
@@ -66,7 +64,7 @@ public class SignInActivity extends FragmentActivity implements CanclableObserve
         spGrade = (Spinner)signInForm.findViewById(R.id.signin_user_grade);
         spClass = (Spinner)signInForm.findViewById(R.id.signin_user_class);
         etName = (EditText)signInForm.findViewById(R.id.signin_user_name);
-        btnSignIn = (Button)signInForm.findViewById(R.id.signin_btn);
+        btnSignIn = (ImageButton)signInForm.findViewById(R.id.signin_btn);
         studentsOnlyInput = (RelativeLayout)signInForm.findViewById(R.id.students_only);
     }
 
@@ -135,21 +133,31 @@ public class SignInActivity extends FragmentActivity implements CanclableObserve
     };
 
     @Override
-    public void dismissDialog(boolean a){
+    public void dismissDialog(String situation){
         checkLoginDialog.cancel();
-        if(a){
-            Toast.makeText(this,"Already log in",Toast.LENGTH_SHORT).show();
+
+        if(situation.equals("success")){
+            Toast.makeText(this,"登录成功",Toast.LENGTH_SHORT).show();
+            this.finish();
+        }else if(situation.equals("failure")){
+
+        }else if(situation.equals("failed_school")){
+            Toast.makeText(this,"无法获取学校信息，请稍后重试",Toast.LENGTH_SHORT).show();
+        }
+        else if(situation.equals("no network")){
+            Toast.makeText(this,"无网络连接，请稍后重试",Toast.LENGTH_SHORT).show();
+            this.finish();
+        }else{
+            Toast.makeText(this,"未知错误，请重试",Toast.LENGTH_SHORT).show();
             this.finish();
         }
-
     }
 
     @Override
     public void displayLoginWindow(){
-        Toast.makeText(this,"should login here",Toast.LENGTH_SHORT).show();
         checkLoginDialog.cancel();
         accountTypeSeletor.setVisibility(View.VISIBLE);
-        mService.doLoadSchool();
+        //mService.doLoadSchool();
     }
 
     private ArrayAdapter<String> getAdapterForStrings(String[] strings) {

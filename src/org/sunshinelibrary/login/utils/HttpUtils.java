@@ -1,13 +1,17 @@
-package org.sunshinelibrary.SunLoginService.utils;
+package org.sunshinelibrary.login.utils;
 
 import android.util.Log;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.sunshinelibrary.login.R;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.net.ConnectException;
+import java.net.InetAddress;
 
 /**
  * @author Yanan Guo
@@ -19,6 +23,8 @@ public class HttpUtils {
     private static final String TAG = "HttpUtils";
     public static final int CHECK = 0;
     public static final int LOGIN = 1;
+    private static HttpResponse response;
+
 
     /**
      * Helper method for fetching http response as String. Response status should be 2xx. Otherwise will return null;
@@ -32,7 +38,12 @@ public class HttpUtils {
 
             case CHECK:
                 try {
-                    HttpResponse response = httpClient.execute(request);
+                    try{
+                        response = httpClient.execute(request);
+                    }catch (Exception e){
+                        Log.e(TAG, String.format("Failed Request: %s [%s]", request.getURI(), request.getMethod()), e);
+                        break;
+                    }
 
                     int statusCode = response.getStatusLine().getStatusCode();
 
@@ -45,14 +56,19 @@ public class HttpUtils {
 
                     result = writer.toString();
 
-                } catch (Exception e) {
+                } catch(Exception e){
                     Log.e(TAG, String.format("Failed Request: %s [%s]", request.getURI(), request.getMethod()), e);
                 }
                 break;
 
             case LOGIN:
                 try {
-                    HttpResponse response = httpClient.execute(request);
+                    try{
+                        response = httpClient.execute(request);
+                    }catch (Exception e){
+                        Log.e(TAG, String.format("Failed Request: %s [%s]", request.getURI(), request.getMethod()), e);
+                        break;
+                    }
 
                     int statusCode = response.getStatusLine().getStatusCode();
 
@@ -67,9 +83,7 @@ public class HttpUtils {
 
                     result = writer.toString();
 
-
-
-                } catch (IOException e) {
+                }catch (Exception e) {
                     Log.e(TAG, String.format("Failed Request: %s [%s]", request.getURI(), request.getMethod()), e);
                 }
                 break;

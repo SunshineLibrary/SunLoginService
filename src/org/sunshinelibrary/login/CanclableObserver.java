@@ -1,4 +1,4 @@
-package org.sunshinelibrary.SunLoginService;
+package org.sunshinelibrary.login;
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,6 +9,6 @@ package org.sunshinelibrary.SunLoginService;
 
 public interface CanclableObserver {
 
-    public void dismissDialog(boolean a);
+    public void dismissDialog(String situation);
     public void displayLoginWindow();
 }

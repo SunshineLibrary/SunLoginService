@@ -1,4 +1,4 @@
-package org.sunshinelibrary.SunLoginService.utils;
+package org.sunshinelibrary.login.utils;
 
 /**
  * @author Bowen Sun
