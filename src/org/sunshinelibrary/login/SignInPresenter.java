@@ -1,12 +1,12 @@
-package org.sunshinelibrary.SunLoginService;
+package org.sunshinelibrary.login;
 
 import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
-import org.sunshinelibrary.SunLoginService.api.ApiClient;
-import org.sunshinelibrary.SunLoginService.api.ApiClientFactory;
-import org.sunshinelibrary.SunLoginService.utils.HttpUtils;
-import org.sunshinelibrary.SunLoginService.utils.StringUtils;
+import org.sunshinelibrary.login.api.ApiClient;
+import org.sunshinelibrary.login.api.ApiClientFactory;
+import org.sunshinelibrary.login.utils.HttpUtils;
+import org.sunshinelibrary.login.utils.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -16,7 +16,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.sunshinelibrary.support.utils.JSONUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -40,9 +39,11 @@ public class SignInPresenter {
     private String mAccountType = StringUtils.EMPTY_STRING;
     private String mBirthday = StringUtils.EMPTY_STRING;
     private String mGrade = StringUtils.EMPTY_STRING;
+    private String mClass = StringUtils.EMPTY_STRING;
     private String mName = StringUtils.EMPTY_STRING;
-    private String errMessage = StringUtils.EMPTY_STRING;
+    private String errMessage = "登录失败,请稍后重试";
     private String mAccessToken = StringUtils.EMPTY_STRING;
+
 
     private String[] schoolStrings;
     private Map<String, String> schoolIds;
@@ -57,35 +58,52 @@ public class SignInPresenter {
         }
     }
 
-    public JSONObject checkLogin() {
+    public JSONObject checkLogin(){
         HttpGet request = new HttpGet(apiClient.getCheckLoginUri(mAccessToken).toString());
-        String str = HttpUtils.getResponse(new DefaultHttpClient(),request,HttpUtils.CHECK);
-        JSONObject response = JSONUtils.parse(str);
-
-        try {
-            if ("200".equals(response.getString("status"))||"401".equals(response.getString("status"))) {
-                return response;
+        try{
+            String str = HttpUtils.getResponse(new DefaultHttpClient(),request,HttpUtils.CHECK);
+            try{
+                JSONObject response = new JSONObject(str);
+                try {
+                    if ("200".equals(response.getString("status"))||"401".equals(response.getString("status"))) {
+                        return response;
+                    }
+                } catch (JSONException e) {
+                    Log.e(TAG, "Failed to parse status.", e);
+                    errMessage =  mSignInActivity.getString(R.string.auth_failure);
+                }
+            }catch (JSONException e){
+                Log.e(TAG, "Failed to parse json", e);
+                errMessage =  mSignInActivity.getString(R.string.auth_failure);
             }
-        } catch (JSONException e) {
-            Log.e(TAG, "Failed to parse status.", e);
-            errMessage =  mSignInActivity.getString(R.string.auth_failure);
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return null;
     }
 
-    public JSONObject authenticate() {
+    public JSONObject authenticate(){
         HttpPost post = getPostMessage();
-        String str = HttpUtils.getResponse(new DefaultHttpClient(), post,HttpUtils.LOGIN);
-        JSONObject response = JSONUtils.parse(str);
-        try {
-            if ("200".equals(response.getString("status"))) {
-                return response;
-            } else {
-                errMessage = response.getString("message");
+        try{
+            String str = HttpUtils.getResponse(new DefaultHttpClient(), post,HttpUtils.LOGIN);
+            try {
+                JSONObject response = new JSONObject(str);
+                try {
+                    if ("200".equals(response.getString("status"))) {
+                        return response;
+                    } else {
+                        errMessage = response.getString("message");
+                    }
+                } catch (JSONException e) {
+                    Log.e(TAG, "Failed to parse status.", e);
+                    errMessage =  mSignInActivity.getString(R.string.auth_failure);
+                }
+            }catch (JSONException e){
+                Log.e(TAG, "Failed to parse json", e);
+                errMessage =  mSignInActivity.getString(R.string.auth_failure);
             }
-        } catch (JSONException e) {
-            Log.e(TAG, "Failed to parse status.", e);
-            errMessage =  mSignInActivity.getString(R.string.auth_failure);
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return null;
     }
@@ -115,6 +133,15 @@ public class SignInPresenter {
     	return mGrade;
     }
 
+    public void setClass(String _class) {
+        mClass = _class;
+    }
+
+    public String getClassName() {
+        return mClass;
+    }
+
+
     public void setName(String name) {
         mName = name;
     }
@@ -139,23 +166,31 @@ public class SignInPresenter {
         mAccessToken = accessToken;
     }
 
-    public String[] loadSchools(String[] emptySchoolStrings) {
+    public String[] loadSchools(String[] emptySchoolStrings){
         HttpGet request = new HttpGet(apiClient.getAllSchoolsUri().toString());
-        String str = HttpUtils.getResponse(new DefaultHttpClient(), request,HttpUtils.LOGIN);
-        JSONArray jsonArr = JSONUtils.parseArray(str);
-        try {
-            schoolStrings = new String[jsonArr.length()];
-            schoolIds = new HashMap<String, String>();
-            String name, id;
-            for (int i = 0; i < jsonArr.length(); i++) {
-                JSONObject row = jsonArr.getJSONObject(i);
-                id = row.getString("uuid");
-                name = row.getString("name");
-                schoolIds.put(name, id);
-                schoolStrings[i] = name;
+        try{
+            String str = HttpUtils.getResponse(new DefaultHttpClient(), request,HttpUtils.LOGIN);
+            try{
+                JSONArray jsonArr = new JSONArray(str);
+                try {
+                    schoolStrings = new String[jsonArr.length()];
+                    schoolIds = new HashMap<String, String>();
+                    String name, id;
+                    for (int i = 0; i < jsonArr.length(); i++) {
+                        JSONObject row = jsonArr.getJSONObject(i);
+                        id = row.getString("uuid");
+                        name = row.getString("name");
+                        schoolIds.put(name, id);
+                        schoolStrings[i] = name;
+                    }
+                } catch (JSONException e) {
+                    Log.e(TAG, "Unable to parse school list: " + jsonArr);
+                }
+            }catch (JSONException e){
+                Log.e(TAG, "Unable to parse json");
             }
-        } catch (JSONException e) {
-            Log.e(TAG, "Unable to parse school list: " + jsonArr);
+        }catch (Exception e){
+            e.printStackTrace();
         }
         if (schoolStrings != null && schoolStrings.length != 0)
             return schoolStrings;
@@ -172,7 +207,9 @@ public class SignInPresenter {
         postParameters.add(new BasicNameValuePair("user_type", mAccountType));
         postParameters.add(new BasicNameValuePair("school_id", mSchoolId));
         postParameters.add(new BasicNameValuePair("grade", mGrade));
-        postParameters.add(new BasicNameValuePair("birthday", mBirthday));
+        postParameters.add(new BasicNameValuePair("class", mClass));
+
+        //  postParameters.add(new BasicNameValuePair("birthday", mBirthday));
 
         HttpPost post = new HttpPost(apiClient.getLoginUri().toString());
         try {
@@ -183,4 +220,3 @@ public class SignInPresenter {
         return post;
     }
 }
-

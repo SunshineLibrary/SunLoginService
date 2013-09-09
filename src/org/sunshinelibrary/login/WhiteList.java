@@ -1,4 +1,4 @@
-package org.sunshinelibrary.SunLoginService;
+package org.sunshinelibrary.login;
 
 
 
@@ -25,7 +25,7 @@ public class WhiteList {
     private ArrayList<String> mArrayListOrigin;
     private ArrayList<String> mArrayListNow;
     private Context mContext;
-    private static final String TAG = "WhiteListRelated";
+    private static final String TAG = "WhiteList";
     private static final String WHITE_LIST = "org.sunshinelibrary.launcher.WHITE_LIST_CHANGED";
 
     public WhiteList(JSONArray arrayOrigin, JSONArray arrayNow, Context context){
@@ -85,8 +85,6 @@ public class WhiteList {
         ArrayList<String> add = new ArrayList<String>();
         add.addAll(mArrayListNow);
         add.removeAll(mArrayListOrigin);
-
-
         intent.putStringArrayListExtra("remove",remove);
         intent.putStringArrayListExtra("add",add);
         mContext.sendBroadcast(intent);

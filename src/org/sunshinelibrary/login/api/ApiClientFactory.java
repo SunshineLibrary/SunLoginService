@@ -1,7 +1,7 @@
-package org.sunshinelibrary.SunLoginService.api;
+package org.sunshinelibrary.login.api;
 
 import android.content.Context;
-import org.sunshinelibrary.SunLoginService.config.Configurations;
+import org.sunshinelibrary.login.config.Configurations;
 
 /**
  * @author Bowen Sun

@@ -1,4 +1,4 @@
-package org.sunshinelibrary.SunLoginService;
+package org.sunshinelibrary.login;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,18 +16,21 @@ import android.util.Log;
 import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.sunshinelibrary.SunLoginService.utils.ConnectionUtils;
-import org.sunshinelibrary.SunLoginService.utils.StringUtils;
-import org.sunshinelibrary.SunLoginService.config.AccessToken;
+import org.sunshinelibrary.login.utils.ConnectionUtils;
+import org.sunshinelibrary.login.utils.StringUtils;
+import org.sunshinelibrary.login.config.AccessToken;
 
 public class SunLoginService extends Service {
+
+    //TODO: change toast to fit various situation
+
     SignInPresenter mPresenter;
     CanclableObserver mActivity;
     SignInActivity mSignInActivity;
     String[] mSchoolStrings;
     String[] mEmptySchoolStrings;
     String[] userInfo;
-    private static final String TAG = "SunLoginService";
+    private static final String TAG = "login";
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -71,27 +74,26 @@ public class SunLoginService extends Service {
 
         @Override
         protected JSONObject doInBackground(Object... params) {
-            return mPresenter.checkLogin();
+                return mPresenter.checkLogin();
         }
 
             @Override
             protected void onPostExecute(JSONObject jo) {
 
                 if(jo!=null){
-
                     try {
                         if(jo.getString("status").equals("200")){
+                            Log.i(TAG,"statuscode"+jo.getString("status"));
                             try {
-                                AccessToken.storeSomething(SunLoginService.this, jo);
-                                System.out.println("succeed to create sharedpreference");
+                                AccessToken.storeAccessToken(SunLoginService.this, jo, false);
                             } catch (JSONException e) {
-                                System.out.println("failed to create sp");
                                 e.printStackTrace();
                             }
-                            notifyAlreadyLogin(true);
+                            notifyAlreadyLogin("success");
                             return;
                         }else if(jo.getString("status").equals("401")){
                             popupLoginWindow();
+                            AccessToken.clearPreference(SunLoginService.this);
                             return;
                         }
                     } catch (JSONException e) {
@@ -99,8 +101,8 @@ public class SunLoginService extends Service {
                     }
                 }
                 Toast.makeText(SunLoginService.this,mPresenter.getErrorMessage(),Toast.LENGTH_SHORT).show();
-                notifyAlreadyLogin(true);
-
+                notifyAlreadyLogin("failure");
+                return;
             }
     }
 
@@ -108,35 +110,33 @@ public class SunLoginService extends Service {
 
         @Override
         protected JSONObject doInBackground(Object... params) {
-
             mPresenter = new SignInPresenter(mSignInActivity);
-
             mSchoolStrings = mPresenter.loadSchools(mEmptySchoolStrings);
-            mPresenter.setSchool(mSchoolStrings[0]);
-
-            mPresenter.setAccountType(userInfo[0]);
-            mPresenter.setGrade(userInfo[1]);
-            //mPresenter.setClass(userInfo[2]);
-            mPresenter.setName(userInfo[3]);
-            mPresenter.setBirthday("2009-09-01");
-
-            return mPresenter.authenticate();
+            if(mSchoolStrings!=null){
+                mPresenter.setSchool(mSchoolStrings[0]);
+                mPresenter.setAccountType(userInfo[0]);
+                mPresenter.setGrade(userInfo[1]);
+                mPresenter.setClass(userInfo[2]);
+                mPresenter.setName(userInfo[3]);
+                return mPresenter.authenticate();
+            }
+            return null;
         }
 
         @Override
         protected void onPostExecute(JSONObject jo){
 
             if(jo!=null){
-
                 try {
                     if(!StringUtils.isEmpty(jo.getString("access_token"))) {
                         try {
-                            AccessToken.storeAccessToken(SunLoginService.this,jo);
+                            AccessToken.storeAccessToken(SunLoginService.this,jo,true);
                             Log.i(TAG,"succeed to create sharedpreference");
                         } catch (JSONException e) {
                             Log.i(TAG,"failed to create sp");
                         }
-                        notifyAlreadyLogin(true);
+                        notifyAlreadyLogin("success");
+                        return;
                     }else{
                         Log.i(TAG,mPresenter.getErrorMessage());
                     }
@@ -144,32 +144,30 @@ public class SunLoginService extends Service {
                     e.printStackTrace();
                 }
             }
-
             Toast.makeText(SunLoginService.this,mPresenter.getErrorMessage(),Toast.LENGTH_SHORT).show();
-            notifyAlreadyLogin(false);
+            notifyAlreadyLogin("failure");
+            return;
         }
-
     }
 
-    public class LoadSchoolTask extends AsyncTask<Object,Object,String>{
+   /* public class LoadSchoolTask extends AsyncTask<Object,Object,String>{
         @Override
         protected String doInBackground(Object... params){
-
             mPresenter = new SignInPresenter(mSignInActivity);
-            mSchoolStrings = mPresenter.loadSchools(mEmptySchoolStrings);
 
+            mSchoolStrings = mPresenter.loadSchools(mEmptySchoolStrings);
             return mSchoolStrings[0];
         }
-    }
+    }*/
 
     public void setCurrentActivity (CanclableObserver co, SignInActivity sa){
         mActivity = co;
         mSignInActivity = sa;
     }
 
-    public void notifyAlreadyLogin(boolean a){
+    public void notifyAlreadyLogin(String situation){
        try{
-           mActivity.dismissDialog(a);
+           mActivity.dismissDialog(situation);
        }catch (Exception e){
            Log.e(TAG,"activity not found");
        }
@@ -185,12 +183,10 @@ public class SunLoginService extends Service {
     }
 
     public void doCheckSignIn(){
-
         if(ConnectionUtils.isConnectbed(SunLoginService.this)){
             new CheckLoginTask().execute();
-
         }else{
-            notifyAlreadyLogin(true);
+            notifyAlreadyLogin("no network");
         }
     }
 
@@ -199,14 +195,16 @@ public class SunLoginService extends Service {
             userInfo = info;
             new LoginTask().execute();
         }else{
-            //TODO: add a button to reconnect wifi.
+            notifyAlreadyLogin("no network");
         }
     }
 
-    public void doLoadSchool(){
+   /* public void doLoadSchool(){
         if(ConnectionUtils.isConnectbed(SunLoginService.this)){
            new LoadSchoolTask().execute();
+        }else{
+            Toast.makeText(SunLoginService.this,"无网络连接，请稍候重试",Toast.LENGTH_LONG).show();
+            notifyAlreadyLogin("no network");
         }
-
-    }
+    }*/
 }
