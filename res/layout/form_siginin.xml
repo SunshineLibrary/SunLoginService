@@ -34,13 +34,13 @@
             android:textSize="24sp"
             android:textColor="#000000"
             android:textColorHint="#cccccc"/>
-    <Button
+    <ImageButton
             android:id="@+id/signin_btn"
             android:layout_width="fill_parent"
             android:layout_height="68dp"
             android:scaleType="centerCrop"
-            android:background="@drawable/repeat"
-            android:text="登录"
+            android:src="@drawable/btn_signin"
+            android:background="#00000000"
             android:textSize="24sp"
             android:textColor="#ffffff"
             android:layout_marginTop="20dp"/>

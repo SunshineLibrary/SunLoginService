@@ -1,12 +1,9 @@
-package org.sunshinelibrary.SunLoginService.api;
+package org.sunshinelibrary.login.api;
 
 import android.content.Context;
 import android.net.Uri;
-import org.apache.http.NameValuePair;
-import org.sunshinelibrary.SunLoginService.config.AccessToken;
-import org.sunshinelibrary.SunLoginService.config.Configurations;
-
-import java.util.ArrayList;
+import org.sunshinelibrary.login.config.AccessToken;
+import org.sunshinelibrary.login.config.Configurations;
 
 public class ApiClient {
 
@@ -46,16 +43,6 @@ public class ApiClient {
         return tableName + ".json";
     }
 
-    public Uri getDownloadUri(String type, long id) {
-        return getApiServerUri().buildUpon().appendPath("download").appendPath(type).appendPath(String.valueOf(id))
-            .appendQueryParameter("access_token", getAccessToken()).build();
-    }
-
-    public Uri getApkUpdateUri() {
-        return getApiServerUri().buildUpon().appendPath("apks").appendPath("get_updates")
-            .appendQueryParameter("access_token", getAccessToken()).build();
-    }
-
     public Uri getAllSchoolsUri() {
         return getApiServerUri().buildUpon().appendPath("schools").appendEncodedPath("get_all.json").build();
     }
@@ -66,9 +53,5 @@ public class ApiClient {
 
     public Uri getCheckLoginUri(String accessToken){
         return getApiServerUri().buildUpon().appendPath("machines").appendEncodedPath("check_token?access_token="+accessToken).build();
-    }
-
-    public Uri getUserRecordPostUri() {
-        return getApiServerUri().buildUpon().appendPath("user_records").appendPath("batch_update.json").build();
     }
 }

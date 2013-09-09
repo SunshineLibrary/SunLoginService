@@ -1,4 +1,4 @@
-package org.sunshinelibrary.SunLoginService;
+package org.sunshinelibrary.login;
 
 import android.content.BroadcastReceiver;
 import android.content.Intent;
