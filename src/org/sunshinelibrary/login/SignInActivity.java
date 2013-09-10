@@ -139,7 +139,9 @@ public class SignInActivity extends FragmentActivity implements CanclableObserve
         if(situation.equals("success")){
             Toast.makeText(this,"登录成功",Toast.LENGTH_SHORT).show();
             this.finish();
-        }else if(situation.equals("failure")){
+        }else if(situation.equals("failure_oncheck")){
+            this.finish();
+        }else if(situation.equals("failure_onlogin")){
 
         }else if(situation.equals("failed_school")){
             Toast.makeText(this,"无法获取学校信息，请稍后重试",Toast.LENGTH_SHORT).show();

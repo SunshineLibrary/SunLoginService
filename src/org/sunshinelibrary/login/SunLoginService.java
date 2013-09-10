@@ -101,7 +101,7 @@ public class SunLoginService extends Service {
                     }
                 }
                 Toast.makeText(SunLoginService.this,mPresenter.getErrorMessage(),Toast.LENGTH_SHORT).show();
-                notifyAlreadyLogin("failure");
+                notifyAlreadyLogin("failure_oncheck");
                 return;
             }
     }
@@ -145,7 +145,7 @@ public class SunLoginService extends Service {
                 }
             }
             Toast.makeText(SunLoginService.this,mPresenter.getErrorMessage(),Toast.LENGTH_SHORT).show();
-            notifyAlreadyLogin("failure");
+            notifyAlreadyLogin("failure_onlogin");
             return;
         }
     }
