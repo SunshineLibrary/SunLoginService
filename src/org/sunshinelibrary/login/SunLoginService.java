@@ -22,15 +22,13 @@ import org.sunshinelibrary.login.config.AccessToken;
 
 public class SunLoginService extends Service {
 
-    //TODO: change toast to fit various situation
-
     SignInPresenter mPresenter;
     CanclableObserver mActivity;
     SignInActivity mSignInActivity;
     String[] mSchoolStrings;
     String[] mEmptySchoolStrings;
     String[] userInfo;
-    private static final String TAG = "login";
+    private static final String TAG = "SunLoginService";
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -77,33 +75,33 @@ public class SunLoginService extends Service {
                 return mPresenter.checkLogin();
         }
 
-            @Override
-            protected void onPostExecute(JSONObject jo) {
+        @Override
+        protected void onPostExecute(JSONObject jo) {
 
-                if(jo!=null){
-                    try {
-                        if(jo.getString("status").equals("200")){
-                            Log.i(TAG,"statuscode"+jo.getString("status"));
-                            try {
-                                AccessToken.storeAccessToken(SunLoginService.this, jo, false);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            notifyAlreadyLogin("success");
-                            return;
-                        }else if(jo.getString("status").equals("401")){
-                            popupLoginWindow();
-                            AccessToken.clearPreference(SunLoginService.this);
-                            return;
+            if(jo!=null){
+                try {
+                    if(jo.getString("status").equals("200")){
+                        Log.i(TAG,"statuscode"+jo.getString("status"));
+                        try {
+                            AccessToken.storeAccessToken(SunLoginService.this, jo, false);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        notifyAlreadyLogin("success");
+                        return;
+                    }else if(jo.getString("status").equals("401")){
+                        popupLoginWindow();
+                        AccessToken.clearPreference(SunLoginService.this);
+                        return;
                     }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                Toast.makeText(SunLoginService.this,mPresenter.getErrorMessage(),Toast.LENGTH_SHORT).show();
-                notifyAlreadyLogin("failure_oncheck");
-                return;
             }
+            Toast.makeText(SunLoginService.this,mPresenter.getErrorMessage(),Toast.LENGTH_SHORT).show();
+            notifyAlreadyLogin("failure_oncheck");
+            return;
+        }
     }
 
     public class LoginTask extends AsyncTask<Object,Object,JSONObject>{
@@ -114,6 +112,7 @@ public class SunLoginService extends Service {
             mSchoolStrings = mPresenter.loadSchools(mEmptySchoolStrings);
             if(mSchoolStrings!=null){
                 mPresenter.setSchool(mSchoolStrings[0]);
+                Log.i(TAG,mSchoolStrings[0]);
                 mPresenter.setAccountType(userInfo[0]);
                 mPresenter.setGrade(userInfo[1]);
                 mPresenter.setClass(userInfo[2]);
