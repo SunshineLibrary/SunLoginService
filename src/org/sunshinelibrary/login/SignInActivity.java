@@ -6,19 +6,23 @@ package org.sunshinelibrary.login;
  * Date: 13-7-30
  * Time: 下午3:34
  */
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.*;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 
-import android.content.Intent;
 import android.os.IBinder;
-import android.content.Context;
-import android.content.ServiceConnection;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 import org.sunshinelibrary.login.SunLoginService.LocalBinder;
-import android.content.ComponentName;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class SignInActivity extends FragmentActivity implements CanclableObserver,AdapterView.OnItemSelectedListener, View.OnClickListener{
@@ -32,15 +36,25 @@ public class SignInActivity extends FragmentActivity implements CanclableObserve
     private ImageButton btnAccountTeacher,btnAccountStudent;
     private LinearLayout signInForm;
     private Spinner spGrade,spClass;
-    private EditText etName;
-    private ImageButton btnSignIn;
+    private EditText etName,etApiServerAddress;
+    private ImageButton btnSignIn,easterEgg;
 
     private String userType = null;
     private String userClass = null;
     private String userGrade = null;
-
     private String[] gradeStrings,classStrings;
 
+    private int count;
+    private long firstTime;
+    private Timer delayTimer;
+    private Handler handler;
+    private TimerTask task;
+    private long interval = 300;
+    private AlertDialog.Builder alertDialogBuilder;
+    private AlertDialog alertDialog;
+
+
+    private String apiAddressNow;
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -53,12 +67,37 @@ public class SignInActivity extends FragmentActivity implements CanclableObserve
     protected void onResume(){
         super.onResume();
         signInForm.setVisibility(View.GONE);
+        count = 0;
+        firstTime = 0;
+
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                if (count == 2) {
+                    if(alertDialog==null){
+                        alertDialog = alertDialogBuilder.show();
+                    }else {
+                        alertDialog.show();
+                    }
+                } else if (count == 3) {
+                    Toast.makeText(SignInActivity.this,"Bazinga!!",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent();
+                    intent.setClass(SignInActivity.this,Sunshine.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    SignInActivity.this.startActivity(intent);
+                }
+                delayTimer.cancel();
+                count = 0;
+                super.handleMessage(msg);
+            }
+        };
     }
 
     private void initialUI(){
         accountTypeSeletor = (RelativeLayout)findViewById(R.id.account_type_selector);
         btnAccountTeacher = (ImageButton)findViewById(R.id.signin_account_teacher);
         btnAccountStudent = (ImageButton)findViewById(R.id.signin_account_student);
+        easterEgg = (ImageButton)findViewById(R.id.easter_egg);
 
         signInForm = (LinearLayout)findViewById(R.id.signin_form);
         spGrade = (Spinner)signInForm.findViewById(R.id.signin_user_grade);
@@ -87,10 +126,43 @@ public class SignInActivity extends FragmentActivity implements CanclableObserve
         spClass.setAdapter(getAdapterForStrings(classStrings));
         spClass.setOnItemSelectedListener(this);
 
-        //
         btnAccountTeacher.setOnClickListener(this);
         btnAccountStudent.setOnClickListener(this);
         btnSignIn.setOnClickListener(this);
+
+        easterEgg.setOnClickListener(this);
+
+        LayoutInflater layoutInflater = LayoutInflater.from(SignInActivity.this);
+        View dialogView = layoutInflater.inflate(R.layout.dialog, null);
+        etApiServerAddress = (EditText)dialogView.findViewById(R.id.api_server_address);
+        try{
+            SharedPreferences preferences = SignInActivity.this.getSharedPreferences("API_SERVER_ADDRESS",MODE_WORLD_READABLE);
+            apiAddressNow = preferences.getString("api_server_address","192.168.3.100");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        etApiServerAddress.setText(apiAddressNow);
+        alertDialogBuilder = new AlertDialog.Builder(SignInActivity.this);
+        alertDialogBuilder.setView(dialogView)
+                .setTitle("设置API服务器地址")
+                .setIcon(R.drawable.icon)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        SharedPreferences preferences = SignInActivity.this.getSharedPreferences("API_SERVER_ADDRESS",MODE_WORLD_READABLE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        if(!etApiServerAddress.getText().toString().equals("")){
+                            editor.putString("api_server_address",etApiServerAddress.getText().toString());
+                            editor.commit();
+                        }else{
+                            editor.putString("api_server_address",SignInActivity.this.getResources().getString(R.string.default_api_server_address));
+                            editor.commit();
+                            dialogInterface.dismiss();
+                        }
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .create();
     }
 
 
@@ -189,8 +261,32 @@ public class SignInActivity extends FragmentActivity implements CanclableObserve
             }else{
                 Toast.makeText(SignInActivity.this,"请输入名字",Toast.LENGTH_LONG).show();
             }
+        }else if(v == easterEgg){
+            long secondTime = System.currentTimeMillis();
+            if (secondTime - firstTime <= interval) {
+                ++count;
+            }
+            delay();
+            firstTime = secondTime;
         }
     }
+
+    // to determine if user has stopped clicking
+    private void delay() {
+        if (task != null)
+            task.cancel();
+
+        task = new TimerTask() {
+            @Override
+            public void run() {
+                Message message = new Message();
+                handler.sendMessage(message);
+            }
+        };
+        delayTimer = new Timer();
+        delayTimer.schedule(task, interval);
+    }
+
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

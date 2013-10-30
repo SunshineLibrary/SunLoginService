@@ -36,9 +36,9 @@ public class AccessToken {
 
 
     public static final String getAccessToken(Context context) {
-        if (StringUtils.isEmpty(mAccessToken)) {
+        //if (StringUtils.isEmpty(mAccessToken)) {
             retrieveAccessToken(context);
-        }
+        //}
         return mAccessToken;
     }
 

@@ -37,8 +37,9 @@ public class WhiteList {
     public boolean isChanged(){
         boolean changed = (mArrayListNow.size() != mArrayListOrigin.size());
 
-        if(!changed)
-            changed = mArrayListNow.containsAll(mArrayListOrigin);
+        if(!changed){
+            changed = !mArrayListNow.containsAll(mArrayListOrigin);
+        }
         return changed;
     }
 
