@@ -92,6 +92,10 @@ public class SunLoginService extends Service {
                     }else if(jo.getString("status").equals("401")){
                         popupLoginWindow();
                         AccessToken.clearPreference(SunLoginService.this);
+
+                        //insure that sunapps won't be showed on Launcher when user logged out
+                        Intent intent = new Intent("org.sunshinelibrary.launcher.ONLY_KEEP_MIN_WHITELIST");
+                        sendBroadcast(intent);
                         return;
                     }
                 } catch (JSONException e) {

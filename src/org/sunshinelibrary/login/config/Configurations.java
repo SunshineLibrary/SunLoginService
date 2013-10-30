@@ -18,7 +18,7 @@ public class Configurations {
 
     public Configurations(Context context) {
         this.context = context;
-        this.preference = PreferenceManager.getDefaultSharedPreferences(context);
+        this.preference = context.getApplicationContext().getSharedPreferences("API_SERVER_ADDRESS",Context.MODE_WORLD_READABLE);
     }
 
     public String getString(String key) {
