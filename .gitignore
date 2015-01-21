@@ -36,3 +36,7 @@ local.properties
 
 # Generated asset files
 ._*
+
+.gradle/
+build/
+import-summary.txt
