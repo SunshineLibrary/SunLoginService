@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.util.logging.LogManager;
 
 /**
  * @author Yanan Guo
@@ -31,6 +32,7 @@ public class HttpUtils {
      */
     public static String getResponse(HttpClient httpClient, HttpUriRequest request, int type) {
         Log.v(TAG, String.format("Starting Request: %s [%s]", request.getURI(), request.getMethod()));
+        LogUtil.log("Starting Request",request.getURI()+request.getMethod());
         StringWriter writer = new StringWriter();
         String result = null;
 
